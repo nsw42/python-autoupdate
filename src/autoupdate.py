@@ -53,7 +53,7 @@ def default_app_dir() -> Path:
     if '__file__' not in dir(__main__):
         raise NoAppDirException("No path found for __main__")
     main = Path(__main__.__file__)
-    return main.parent
+    return main.parent.resolve()
 
 
 def resolve_app_dir(app_dir: Union[str, Path, None]) -> Path:
@@ -66,7 +66,7 @@ def resolve_app_dir(app_dir: Union[str, Path, None]) -> Path:
     if not app_dir.is_absolute():
         app_dir = default_app_dir() / app_dir
 
-    return app_dir
+    return app_dir.resolve()
 
 
 def resolve_file_path(app_dir: Path, file_path: Union[str, Path, None], default_leaf: str) -> Path:
