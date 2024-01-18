@@ -80,17 +80,9 @@ autoupdate.check_archive(url='https://myapplication.com/latest',
 
 Note that the current version of the application is temporarily renamed with a `.bak` suffix during the upgrade process; anything existing at that location will be deleted.
 
-Arguments:
-
-* `url` (`str`): the URL to fetch, which is expected to return a redirect to an archive file (any file format that can be extracted by `shutil.unpack_archive`)
-* `app_dir` (`str`, `Path` or `None`): the application root directory, as explained above
-* `version_file` (`str`, `Path` or `None`): a file that records the URL of the most recently downloaded version. If specified, the path can be relative (to the application root directory), or absolute; if not specified, a file `.autoupdate.url` inside the application root directory is used.
-* `timeout` (int): the timeout, in seconds, to use for each request (firstly, downloading the constant URL, and secondly downloading the archive itself).
-* `archive_contains_app_dir` (`True`, `False` or `None`): whether the archive contains the application, including a new application root directory, or just the application contents. See 'Archive contents format', below.
-
 ### Archive contents format
 
-The archive of an application can take one of two formats: either, the archive can contain an application directory, which in turn contains the application contents, or the archive can contain the application contents without an intermediate directory. These alternatives are shown-below:
+The archive of an application can take one of two formats: either, the archive can contain an application directory, which in turn contains the application itself, or the archive can contain the application contents without an intermediate directory. These alternatives are shown-below:
 
 With an application directory:
 
@@ -118,3 +110,11 @@ The `archive_contains_app_dir` parameter to `check_archive` indicates what the u
 * `None`: the library automatically detects whether the archive contains an application directory: if the top-level of the archive consists of a single item, which is a directory, then that is treated as the application directory; if there is more than one item in the top-level of the archive, or the single item is a file, then it is assumed that the archive contents are the replacement for the application directory contents.
 * `True`: the archive is expected to contain a single top-level directory; an `autoupdate.ExtractException` is raised if that is not true. The directory is then moved into place as the new application root directory.
 * `False`: the archive is expected to contain the application contents themselves; this is only likely to be useful if the application contents are deliberately nested inside an extra directory, and it is desired to keep that directory.
+
+### check_archive arguments
+
+* `url` (`str`): the URL to fetch, which is expected to return a redirect to an archive file (any file format that can be extracted by `shutil.unpack_archive`)
+* `app_dir` (`str`, `Path` or `None`): the application root directory, as explained above
+* `version_file` (`str`, `Path` or `None`): a file that records the URL of the most recently downloaded version. If specified, the path can be relative (to the application root directory), or absolute; if not specified, a file `.autoupdate.url` inside the application root directory is used.
+* `timeout` (int): the timeout, in seconds, to use for each request (firstly, downloading the constant URL, and secondly downloading the archive itself).
+* `archive_contains_app_dir` (`True`, `False` or `None`): whether the archive contains the application, including a new application root directory, or just the application contents. See 'Archive contents format', above.
