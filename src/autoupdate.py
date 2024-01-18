@@ -100,9 +100,7 @@ def find_redirect_destination(url: str, timeout: int) -> str:
     return response.headers['location']
 
 
-def get_current_version(app_dir: Path, version_file: Path) -> Union[str, None]:
-    version_file = resolve_file_path(app_dir, version_file, '.autoupdate.url')
-
+def get_current_version(version_file: Path) -> Union[str, None]:
     if not version_file.is_file():
         return None
 
@@ -156,7 +154,8 @@ def check_archive(url: str,
                   timeout: int = 60,
                   archive_contains_app_dir: Union[bool, None] = None):
     app_dir = resolve_app_dir(app_dir)
-    current_version = get_current_version(app_dir, version_file)
+    version_file = resolve_file_path(app_dir, version_file, '.autoupdate.url')
+    current_version = get_current_version(version_file)
     destination = find_redirect_destination(url, timeout)
 
     if destination == current_version:
