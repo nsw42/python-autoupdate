@@ -112,10 +112,12 @@ def check_archive(url: str,
         logging.debug(f"Latest available version is at {destination} which is already installed")
 
     with tempfile.TemporaryDirectory() as tempdir:
+        tempdir = Path(tempdir)
+
         # Fetch the new version
         with requests.get(destination, stream=True, timeout=timeout) as response:
             response.raise_for_status()
-            tgz_path = Path(tempdir) / 'download.tgz'
+            tgz_path = tempdir / 'download.tgz'
             with open(tgz_path, 'wb') as handle:
                 for chunk in response.iter_content(chunk_size=16384):
                     if chunk:
