@@ -18,6 +18,8 @@ The first relies on the application being a `git clone` of some repository; the 
 
 The alternative approach relies on the ability to access a constant URL e.g. `https://myapplication.com/latest`, which redirects to an archive file (e.g. `.tar.gz` or `.zip`); the autoupdate then unpacks the archive, and replaces the current application directory with the unpacked version.
 
+There is also a wrapper function, which automatically detects which is the correct operation to perform, which allows a single codebase to work from both a git clone and a packaged download.
+
 Note that there is not yet a mechanism for running any script (e.g. to perform database schema migration) as part of the update mechanism; any such activity therefore needs to be handled as part of the application launcher.
 
 ## Application root directory
@@ -55,6 +57,12 @@ autoupdate.git_pull(app_dir='/home/nsw42/myapp',
 ### Error handling
 
 If `git pull` exits non-zero, then an `autoupdate.GitPullException` is raised, which will have `stdout` and `stderr` member variables containing the subprocess output.
+
+### git_pull arguments
+
+* `app_dir` (`str`, `Path` or `None`): the application root directory, as explained above
+* `git` (str): The location of the git binary. Default value is `git`, which relies on the binary being in `$PATH`.
+* `timeout` (int): the timeout, in seconds, to use for the git pull operation. Default values is 60 seconds.
 
 ## Update from archive file
 
@@ -118,3 +126,24 @@ The `archive_contains_app_dir` parameter to `check_archive` indicates what the u
 * `version_file` (`str`, `Path` or `None`): a file that records the URL of the most recently downloaded version. If specified, the path can be relative (to the application root directory), or absolute; if not specified, a file `.autoupdate.url` inside the application root directory is used.
 * `timeout` (int): the timeout, in seconds, to use for each request (firstly, downloading the constant URL, and secondly downloading the archive itself).
 * `archive_contains_app_dir` (`True`, `False` or `None`): whether the archive contains the application, including a new application root directory, or just the application contents. See 'Archive contents format', above.
+
+## Automatically detecting the appropriate autoupdate mechanism
+
+To automatically detect whether to perform a `git pull` or to download and unpack an archive, the `autoupdate` wrapper function looks for a `.git` folder in the top-level of the application directory, and calls `git_pull` if it is found, and `check_archive` otherwise:
+
+```python
+import autoupdate
+
+autoupdate.autoupdate('https://myapplication.com/latest')
+```
+
+This wrapper also allows the default values to be overridden, via kwargs:
+
+```python
+autoupdate.autoupdate(url='https://myapplication.com/latest',
+                      app_dir='/home/nsw42/app',
+                      git='/home/nsw42/bin/git',
+                      version_file='/home/nsw42/.app.current_version_url')
+```
+
+The names of the arguments in the kwargs are the same as those for `git_pull` and `check_archive`.
